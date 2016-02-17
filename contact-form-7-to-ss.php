@@ -61,21 +61,25 @@ class wpcf7_SpreadSheet {
 		$options = $this->_getOptions();
 
 		$option = $options['forms'][$cf7->id];
-		
+
 		if ( ! empty($option) ) {
 			$option = array_merge($this->form_defaults, $option);
 			$app_url = $option['app_url'];
 			$this->postdata = array();
+			$submission = WPCF7_Submission::get_instance();
 
-			foreach ($cf7->posted_data as $key => $value) {
-				if ( strpos($key, '_wp') !== 0 ) {
-					if ( is_array($value) ) {
-						$this->postdata[$key] = implode(',', $value);
-					} else {
-						$this->postdata[$key] = $value;
+			if ($submission) {
+				foreach ($submission->get_posted_data() as $key => $value) {
+					if ( strpos($key, '_wp') !== 0 ) {
+						if ( is_array($value) ) {
+							$this->postdata[$key] = implode(',', $value);
+						} else {
+							$this->postdata[$key] = $value;
+						}
 					}
 				}
 			}
+
 			if ( !isset($this->postdata['ip_address']) && $option['get_ip_address'] ) {
 				$this->postdata['ip_address'] = $_SERVER['REMOTE_ADDR'];
 			}
@@ -188,7 +192,7 @@ class wpcf7_SpreadSheet {
 			$out .= '</p>';
 
 			if ( !empty($cf7_id) ) {
-				
+
 				if ( !empty($options['forms'][$cf7_id]) ) {
 					$option = $options['forms'][$cf7_id];
 				} else {
@@ -248,7 +252,7 @@ class wpcf7_SpreadSheet {
 				$out .= '<p>';
 				$out .= '<input type="submit" class="button button-primary" value="' . __('Save Changes', $this->textdomain) . '" />';
 				$out .= '</p>';
-				
+
 				$out .= '</form>';
 				$out .= '</p>';
 			} else {
